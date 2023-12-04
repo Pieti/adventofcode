@@ -1,4 +1,5 @@
 import sys
+from collections import Counter
 from typing import NamedTuple
 
 with open(sys.argv[1]) as f:
@@ -38,14 +39,16 @@ def parse_line(line):
 
 cards = []
 for line in lines:
-    cards.append(parse_line(line))
+    card = parse_line(line)
+    cards.append(card)
 
-weights = [1 for _ in cards]
-for i, card in enumerate(cards):
-    for _ in range(weights[i]):
-        value = card.value()
-        end = min(i + value, len(weights))
-        for j in range(i, end):
-            weights[j + 1] += 1
+counter = Counter((c.id for c in cards))
 
-print(sum(weights))
+for c in cards:
+    for i in range(c.value()):
+        c_id = c.id + i + 1
+
+        if c_id in counter:
+            counter[c_id] += counter[c.id]
+
+print(sum(counter.values()))
